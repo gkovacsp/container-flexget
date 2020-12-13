@@ -1,11 +1,5 @@
-ARG ALPINE_VER
-ARG LIBTORRENT_VER
-
-FROM wiserain/libtorrent:${LIBTORRENT_VER}-alpine${ALPINE_VER}-py3 AS libtorrent
-FROM lsiobase/alpine:${ALPINE_VER}
+FROM lsiobase/alpine:arm32v7-3.12
 LABEL maintainer "wiserain"
-
-ARG FLEXGET_VER
 
 RUN \
     echo "**** install frolvlad/alpine-python3 ****" && \
@@ -15,31 +9,19 @@ RUN \
 	rm -r /usr/lib/python*/ensurepip && \
 	pip3 install --no-cache --upgrade pip setuptools wheel && \
 	if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip; fi && \
-	echo "**** install dependencies for plugin: telegram ****" && \
-	apk add --no-cache --virtual=build-deps gcc python3-dev libffi-dev musl-dev openssl-dev && \
-	pip install --upgrade python-telegram-bot==12.8 PySocks && \
-	apk del --purge --no-cache build-deps && \
-	echo "**** install dependencies for plugin: cfscraper ****" && \
-	apk add --no-cache --virtual=build-deps g++ gcc python3-dev libffi-dev openssl-dev && \
-	pip install --upgrade cloudscraper && \
-	apk del --purge --no-cache build-deps && \
-	echo "**** install dependencies for plugin: convert_magnet ****" && \
-	apk add --no-cache boost-python3 libstdc++ && \
-	echo "**** install dependencies for plugin: decompress ****" && \
-	apk add --no-cache unrar && \
-	pip install --upgrade \
-		rarfile && \
 	echo "**** install dependencies for plugin: misc ****" && \
 	pip install --upgrade \
-		transmissionrpc \
-		deluge-client \
-		irc_bot && \
+		transmissionrpc
+
+RUN \
 	echo "**** install flexget ****" && \
 	apk add --no-cache --virtual=build-deps gcc libxml2-dev libxslt-dev libc-dev python3-dev jpeg-dev && \
 	pip install --upgrade --force-reinstall \
-		flexget==${FLEXGET_VER} && \
+		flexget && \
 	apk del --purge --no-cache build-deps && \
-	apk add --no-cache libxml2 libxslt jpeg && \
+	apk add --no-cache libxml2 libxslt jpeg 
+
+RUN \
 	echo "**** system configurations ****" && \
 	apk --no-cache add bash bash-completion tzdata && \
 	echo "**** cleanup ****" && \
@@ -47,17 +29,15 @@ RUN \
 		/tmp/* \
 		/root/.cache
 
-# copy libtorrent libs
-COPY --from=libtorrent /libtorrent-build/usr/lib/ /usr/lib/
+# RUN echo "3"
 
 # copy local files
 COPY root/ /
 
 # add default volumes
-VOLUME /config /data
+VOLUME /config
 WORKDIR /config
 
-# HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "cd /config && if [[ $(flexget daemon status | tail -n1 | grep running | wc -l) == "1" ]]; then exit 0; else exit 1; fi" ]
-
 # expose port for flexget webui
+EXPOSE 5051 5051/tcp
 EXPOSE 5050 5050/tcp

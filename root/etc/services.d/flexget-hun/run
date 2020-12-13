@@ -2,7 +2,7 @@
 
 command="
 flexget
--c /config/config.yml
+-c /config/hun/config.yml
 --loglevel ${FG_LOG_LEVEL:-info}
 daemon start --autoreload-config
 "
