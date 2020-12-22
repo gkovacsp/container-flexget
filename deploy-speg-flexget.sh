@@ -1,5 +1,5 @@
 echo ":: building container"
-docker build -t splexget .
+docker build -t flexget .
 
 echo ":: remove old container"
 docker container rm splexget-old
@@ -27,9 +27,9 @@ docker run \
     \
     --restart unless-stopped \
     -d \
-    splexget
+    flexget
 
 #    -e FG_WEBUI_PASSWD=Aranka74F \
 
 echo ":: follow logs"
-docker logs -f splexget
+docker logs -f flexget
