@@ -1,16 +1,16 @@
 echo ":: building container"
-docker build -t flexget .
+docker build -t speg-flexget .
 
 echo ":: remove old container"
-docker container rm splexget-old
+docker container rm flexget-old
 echo ":: stop running container"
-docker container stop splexget
+docker container stop flexget
 echo ":: rename stopped container"
-docker container rename splexget splexget-old
+docker container rename flexget flexget-old
 echo ":: start container"
 
 docker run \
-    --name splexget \
+    --name flexget \
     \
     -e FG_LOG_LEVEL=info \
     \
@@ -27,7 +27,7 @@ docker run \
     \
     --restart unless-stopped \
     -d \
-    flexget
+    speg-flexget
 
 #    -e FG_WEBUI_PASSWD=Aranka74F \
 
