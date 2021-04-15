@@ -1,0 +1,14 @@
+#!/usr/bin/with-contenv bash
+
+if command -v flexget >/dev/null 2>&1; then
+    echo ":: Checking for flexget update"
+    if flexget -V | grep 'Latest'; then
+        echo ":: ... updating"
+        pip3 install --upgrade flexget
+    else
+        echo ":: ... flexget is up to date"
+    fi
+else
+    echo ":: Installing flexget"
+    pip3 install --upgrade --force-reinstall flexget
+fi
